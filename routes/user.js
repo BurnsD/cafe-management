@@ -136,6 +136,14 @@ router.patch('/update',(req,res)=>{
             return res.status(500).json(err);
         }
     })
+});
+
+router.get('checkTokern',(req,res)=>{
+    return res.status(200).json({message: "true"});
+})
+
+router.post('/changePassword',(req,res)=>{
+    
 })
 
 module.exports = router;
