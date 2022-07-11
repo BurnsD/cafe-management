@@ -14,6 +14,7 @@ connection.connect((err) =>{
         console.log("Connection Successful")
     }
     else {
+        console.log('Something has failed')
         console.log(err);
     }
 });
