@@ -6,8 +6,8 @@ const router = express.Router();
 const jwt = -require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
-var auth = require('../services/authentication');
-var checkRole = require('../services/checkRole')
+var auth = require("../services/authentication");
+var checkRole = require("../services/checkRole");
 
 router.post("/signup", (req, res) => {
   let user = req.body;
@@ -96,15 +96,16 @@ router.post("/forgotPassword", (req, res) => {
             results[0].password +
             '<br><a href="">CLick here to login</a></p>',
         };
-        transporter.sendMail(mailOptions,function(error,info){
-            if(error){
-                console.log(error);
-            }
-            else{
-                console.log('Email sent: '+info.response)
-            }
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
         });
-        return res.status(200).json({message: "Password sent successfully to your email."})
+        return res
+          .status(200)
+          .json({ message: "Password sent successfully to your email." });
       }
     } else {
       return res.status(500).json(err);
@@ -112,66 +113,70 @@ router.post("/forgotPassword", (req, res) => {
   });
 });
 
-router.get('/get',auth.authenticateToken,checkRole.checkRole,(req,res)=>{
-    var query ="select id,name,email,contactNumber,status from user where role='user'"
-    connection.query(query,(err,results)=>{
-        if(!err){
-            return res.status(200).json(results);
-        }
-        else{
-            return res.status(500).json(err);
-        }
-    })
+router.get("/get", auth.authenticateToken, checkRole.checkRole, (req, res) => {
+  var query =
+    "select id,name,email,contactNumber,status from user where role='user'";
+  connection.query(query, (err, results) => {
+    if (!err) {
+      return res.status(200).json(results);
+    } else {
+      return res.status(500).json(err);
+    }
+  });
 });
 
-router.patch('/update',auth.authenticateToken,checkRole.checkRole,(req,res)=>{
+router.patch(
+  "/update",
+  auth.authenticateToken,
+  checkRole.checkRole,
+  (req, res) => {
     let user = req.body;
-    var query = "update user set status=? where id=?"
-    connection.query(query,[user.status,user.id],(err,results)=>{
-        if(!err){
-            if(results.affectedRows == 0){
-                return res.status(404).json({message:"User id does not exist"});
-            }
-            return res.status(200).json({message:"User Update Successfully"})
+    var query = "update user set status=? where id=?";
+    connection.query(query, [user.status, user.id], (err, results) => {
+      if (!err) {
+        if (results.affectedRows == 0) {
+          return res.status(404).json({ message: "User id does not exist" });
         }
-        else{
-            return res.status(500).json(err);
-        }
-    })
+        return res.status(200).json({ message: "User Update Successfully" });
+      } else {
+        return res.status(500).json(err);
+      }
+    });
+  }
+);
+
+router.get("checkToken", (req, res) => {
+  return res.status(200).json({ message: "true" });
 });
 
-router.get('checkToken',(req,res)=>{
-    return res.status(200).json({message: "true"});
-})
-
-router.post('/changePassword',(req,res)=>{
-    const user = req.body;
-    const email = res.locals.email;
-    var query = "select *from user where email=? and password=?"
-    connection.query(query,[email,user.oldPassword],(err,results)=>{
-        if(!err){
-            if(results.length <=0){
-                return res.status(400).json({message:"Incorrect Old Password"});
-            }
-            else if(results[0].password == user.oldPassword){
-                query = "update user set password=? where email=?"
-                connection.query(query,[user.newPassword,email],(err,results)=>{
-                    if(!err){
-                        return res.status(200).json({message:"Password Updated Successfully."})
-                    }
-                    else{
-                        return res.status(500).json(err);
-                    }
-                })
-            }
-            else{
-                return res.status(400).json({message:"Something went wrong. Please try again"});
-            }
-        }
-        else{
+router.post("/changePassword", (req, res) => {
+  const user = req.body;
+  const email = res.locals.email;
+  var query = "select *from user where email=? and password=?";
+  connection.query(query, [email, user.oldPassword], (err, results) => {
+    if (!err) {
+      if (results.length <= 0) {
+        return res.status(400).json({ message: "Incorrect Old Password" });
+      } else if (results[0].password == user.oldPassword) {
+        query = "update user set password=? where email=?";
+        connection.query(query, [user.newPassword, email], (err, results) => {
+          if (!err) {
+            return res
+              .status(200)
+              .json({ message: "Password Updated Successfully." });
+          } else {
             return res.status(500).json(err);
-        }
-    })
-})
+          }
+        });
+      } else {
+        return res
+          .status(400)
+          .json({ message: "Something went wrong. Please try again" });
+      }
+    } else {
+      return res.status(500).json(err);
+    }
+  });
+});
 
 module.exports = router;
