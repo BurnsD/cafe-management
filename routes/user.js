@@ -149,7 +149,7 @@ router.get("checkToken", (req, res) => {
   return res.status(200).json({ message: "true" });
 });
 
-router.post("/changePassword", (req, res) => {
+router.post("/changePassword", auth.authenticateToken, (req, res) => {
   const user = req.body;
   const email = res.locals.email;
   var query = "select *from user where email=? and password=?";
