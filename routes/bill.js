@@ -8,6 +8,7 @@ var fs = require("fs");
 var uuid = require("uuid");
 var auth = require("../services/authentication");
 
+// Generate New PDF Report
 router.post("/generateReport", auth.authenticateToken, (req, res) => {
   const generatdUuid = uuid.v1();
   const orderDetails = req.body;
@@ -65,6 +66,7 @@ router.post("/generateReport", auth.authenticateToken, (req, res) => {
   );
 });
 
+// POST for New PDF file
 router.post("/getPdf", auth.authenticateToken, function (req, res) {
   const orderDetails = req.body;
   const pdfPath = "./generated_pdf/" + orderDetails.uuid + ".pdf";
@@ -107,6 +109,7 @@ router.post("/getPdf", auth.authenticateToken, function (req, res) {
   }
 });
 
+// GET Bills API
 router.get("/getBills", auth.authenticateToken, (req, res, next) => {
   var query = "select *from bill order by id DESC";
   connection.query(query, (err, results) => {
@@ -118,6 +121,7 @@ router.get("/getBills", auth.authenticateToken, (req, res, next) => {
   });
 });
 
+// Delete Bills API
 router.delete("/delete/:id", auth.authenticateToken, (req, res, next) => {
   const id = req.params.id;
   var query = "delete from bill where id=?";
